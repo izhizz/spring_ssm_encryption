@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+
+    <!--<context:property-placeholder location="classpath:db.properties"/>-->
+
+
+    <!-- 3.数据源 DataSource -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <context:annotation-config />
+    <!--自动扫描，将标注spring注解的类自动转化bean-->
+    <!--<context:component-scan base-package="demo.service" />-->
+    <!--配置sessionfactory-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="typeAliasesPackage" value="com.bean" />
+        <!--绑定数据源-->
+        <property name="dataSource" ref="dataSource" />
+        <!--自动扫描dao.xml文件-->
+        <property name="mapperLocations" value="classpath:com/demo/persistence/mapping/*.xml" />
+    </bean>
+    <!--装配dao接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- DAO接口所在包名，Spring会自动查找其下的类dao.class -->
+        <property name="basePackage" value="com.demo.persistence" />
+    </bean>
+
+    <!-- spring扫描service层@Service Controller交给springmvc管理 -->
+    <context:component-scan base-package="com.demo.controller">
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+</beans>
